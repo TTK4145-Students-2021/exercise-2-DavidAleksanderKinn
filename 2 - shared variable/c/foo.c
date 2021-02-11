@@ -2,12 +2,15 @@
 #include <stdio.h>
 
 int i = 0;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Note the return type: void*
 void* incrementingThreadFunction(){
     for (int j = 0; j < 1000000; j++) {
 	// TODO: sync access to i
+    pthread_mutex_lock(&mutex);
 	i++;
+    pthread_mutex_unlock(&mutex);
     }
     return NULL;
 }
@@ -15,11 +18,14 @@ void* incrementingThreadFunction(){
 void* decrementingThreadFunction(){
     for (int j = 0; j < 1000000; j++) {
 	// TODO: sync access to i
+    pthread_mutex_lock(&mutex);
 	i--;
+    pthread_mutex_unlock(&mutex);
     }
     return NULL;
 }
-
+ //Mutex is used over semaphores since the resource (variable "i") should only be acsessed by one process at the time. 
+ //Therefore it would be a safer option to have a lower accessibility then in semaphores.
 
 int main(){
     pthread_t incrementingThread, decrementingThread;
